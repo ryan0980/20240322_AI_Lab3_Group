@@ -1,17 +1,18 @@
 class TicTacToe:
-    def __init__(self, n):
+    def __init__(self, boardSize=12, target=6):
         """
         初始化一个n*n的棋盘。
         """
-        self.board = [["0" for _ in range(n)] for _ in range(n)]
-        self.size = n
+        self.board = [["-" for _ in range(boardSize)] for _ in range(boardSize)]
+        self.boardSize = boardSize
+        self.target = target
 
     def place_piece(self, x, y, piece):
         """
         在棋盘上放置一个棋子。
         """
-        if 0 <= x < self.size and 0 <= y < self.size:
-            if self.board[x][y] == "0":
+        if 0 <= x < self.boardSize and 0 <= y < self.boardSize:
+            if self.board[x][y] == "-":
                 self.board[x][y] = piece
                 return True  # 成功放置棋子
             else:
