@@ -28,3 +28,45 @@ class TicTacToe:
         """
         for row in self.board:
             print(row)
+
+    def generate_moves(self):
+        """
+        生成所有可能的下一步走法。
+        """
+        moves = []
+        for x in range(self.boardSize):
+            for y in range(self.boardSize):
+                if self.board[x][y] == "-":
+                    moves.append((x, y))
+        return moves
+
+    def check_win(self, x, y, piece):
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # 水平，垂直，两个对角线
+        for dx, dy in directions:
+            count = 1  # 包括当前放置的棋子
+            # 检查一个方向上的连续相同棋子
+            for step in range(1, self.target):
+                nx, ny = x + dx * step, y + dy * step
+                if (
+                    0 <= nx < self.boardSize
+                    and 0 <= ny < self.boardSize
+                    and self.board[nx][ny] == piece
+                ):
+                    count += 1
+                else:
+                    break
+            # 检查相反方向上的连续相同棋子
+            for step in range(1, self.target):
+                nx, ny = x - dx * step, y - dy * step
+                if (
+                    0 <= nx < self.boardSize
+                    and 0 <= ny < self.boardSize
+                    and self.board[nx][ny] == piece
+                ):
+                    count += 1
+                else:
+                    break
+            # 如果连续相同棋子的数量达到了target，则当前玩家获胜
+            if count >= self.target:
+                return True
+        return False
