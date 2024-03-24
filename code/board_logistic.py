@@ -22,6 +22,16 @@ class TicTacToe:
             print("坐标超出棋盘范围。")
             return False  # 坐标超出范围，放置失败
 
+    def is_draw(self):
+        """
+        检查棋盘是否已满，即是否平局。
+        """
+        return all(
+            self.board[x][y] != "-"
+            for x in range(self.boardSize)
+            for y in range(self.boardSize)
+        )
+
     def print_board(self):
         """
         打印当前棋盘的状态。
@@ -31,7 +41,7 @@ class TicTacToe:
 
     def generate_moves(self):
         """
-        生成所有可能的下一步走法。
+        生成所有可能的下一步走法。empty blank
         """
         moves = []
         for x in range(self.boardSize):
@@ -40,7 +50,23 @@ class TicTacToe:
                     moves.append((x, y))
         return moves
 
+    def best_move(self):
+        best_score = float("-inf")
+        best_move = set()
+        for move in self.generate_moves():
+            score = self.minimax(move)
+            if score >= best_score:
+                best_score = score
+                best_move.add(move)
+        return best_move
+
+    def minimax(self):
+        pass
+
     def check_win(self, x, y, piece):
+        """
+        check if win after piece is placed, return bool
+        """
         directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # 水平，垂直，两个对角线
         for dx, dy in directions:
             count = 1  # 包括当前放置的棋子
