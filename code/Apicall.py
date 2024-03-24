@@ -1,8 +1,8 @@
 import requests
 # define all the GET Method in this class
 headers = {
-            'x-api-key': YOUROWNKEY,
-            'userId': YOURID,
+            'x-api-key': '3e39b9b8cab6cae613bc',
+            'userId': '3631',
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'PostmanRuntime/7.37.0',
             'Connection': 'keep-alive',
@@ -25,7 +25,7 @@ class GET:
     # Parameters: type=moves, gameId, Count of most recent of moves
     # Return Values: List of Moves, comma separated
     def getMoves(self, gameid: str, movescount: int) ->None:
-        self.url = 'https://www.notexponential.com/aip2pgaming/api/index.php?type=boardMap&gameId='+ gameid+'&count='+ str(movescount)
+        self.url = 'https://www.notexponential.com/aip2pgaming/api/index.php?type=moves&gameId='+ gameid+'&count='+ str(movescount)
     
     # Parameters: type=boardString, gameId
     # Return Values: Board, in form of a string of O,X,-
@@ -101,3 +101,8 @@ class POST:
 # print(post_test.payload)
 # response = requests.request("POST", url = post_test.url, headers=post_test.headers, data = post_test.payload)
 # print(response.text)
+if __name__ == "__main__":
+    get_test = GET()
+    get_test.getBoardString('4684')
+    response = requests.request("GET", url=get_test.url, headers=get_test.headers)
+    print(response.text)
