@@ -176,6 +176,24 @@ class TicTacToe:
                         moves.append((x, y))
         return moves
 
+    def set_board(self, input_board):
+        self.board = input_board
+        self.check_next_move_player()
+
+    def check_next_move_player(self):
+        o_count = 0
+        x_count = 0
+        for row in self.board:
+            for cell in row:
+                if cell is True:
+                    o_count += 1
+                elif cell is False:
+                    x_count += 1
+
+        # 如果 'O' 的数量等于 'X' 的数量，下一个玩家是 'O' (True)
+        # 否则，下一个玩家是 'X' (False)
+        self.is_max_player = o_count == x_count
+
     def best_move(self):
         """
         使用 minimax 算法来确定最佳走法。这个方法首先生成所有可能的走法，
@@ -200,6 +218,35 @@ class TicTacToe:
                 best_move = move
         return best_move
 
+    def minimax(self, depth, is_max_player):
+        status, player = self.check_status()
+        if status == "Win":
+            return (1 if player == True else -1) * (self.max_step - depth)
+        elif status == "Draw":
+            return 0
+        if depth == self.max_step:
+            evaluator = ScoreEvaluator(self.board, self.target)
+            return evaluator.evaluate_score(self.is_max_player)
+
+        if is_max_player:
+            maxEval = float("-inf")
+            for move in self.generate_moves():
+                x, y = move
+                self.place_piece(x, y)
+                eval = self.minimax(depth + 1, False)
+                self.remove_piece(x, y)
+                maxEval = max(maxEval, eval)
+            return maxEval
+        else:
+            minEval = float("inf")
+            for move in self.generate_moves():
+                x, y = move
+                self.place_piece(x, y)
+                eval = self.minimax(depth + 1, True)
+                self.remove_piece(x, y)
+                minEval = min(minEval, eval)
+            return minEval
+
 
 class ScoreEvaluator:
     def __init__(self, board, target=6):
@@ -220,6 +267,10 @@ class ScoreEvaluator:
                 if self.board[x][y] == piece:
                     for dx, dy in directions:
                         score += self.evaluate_direction(x, y, dx, dy, piece)
+
+        # 如果棋子是 "X"，取负分
+        if not piece:
+            score = -score
 
         return score
 
@@ -271,7 +322,7 @@ class ScoreEvaluator:
 
         # 根据连续棋子和阻塞情况计算得分
         if consecutive >= self.target:
-            return float("inf")  # 达到或超过获胜条件
+            score = float("inf")  # 达到或超过获胜条件
         elif blocked == 0:
             score = 10**consecutive  # 无阻塞，得分为连续棋子数的指数
         elif blocked == 1:
