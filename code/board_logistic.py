@@ -7,7 +7,7 @@ class TicTacToe:
         self.board = [[None for _ in range(boardSize)] for _ in range(boardSize)]
         self.boardSize = boardSize
         self.target = target
-        self.max_step = 100  # 树中的最大步数
+        self.max_step = 2  # 树中的最大步数
         self.is_max_player = True  # 开始时默认为 True，即 O (最大玩家) 先行
 
     def check_status(self):
@@ -156,15 +156,15 @@ class TicTacToe:
         return None
 
     def generate_moves(self):
-        """
-        从棋盘中心向外生成所有可能的下一步走法。
-        只包括当前为空（None）的位置。
-        """
         moves = []
         center = self.boardSize // 2
         for layer in range(center + 1):
-            for x in range(center - layer, center + layer + 1):
-                for y in range(center - layer, center + layer + 1):
+            for x in range(
+                max(0, center - layer), min(self.boardSize, center + layer + 1)
+            ):
+                for y in range(
+                    max(0, center - layer), min(self.boardSize, center + layer + 1)
+                ):
                     if (
                         x == center - layer
                         or x == center + layer
@@ -172,7 +172,7 @@ class TicTacToe:
                         or y == center + layer
                     ) and self.board[x][
                         y
-                    ] is None:  # 检查位置是否为空
+                    ] is None:  # 确保使用有效的索引访问棋盘
                         moves.append((x, y))
         return moves
 
@@ -195,28 +195,34 @@ class TicTacToe:
         self.is_max_player = o_count == x_count
 
     def best_move(self):
-        """
-        使用 minimax 算法来确定最佳走法。这个方法首先生成所有可能的走法，
-        然后对每一个可能的走法调用 minimax 方法来评估它的得分。基于 minimax
-        算法的返回值，选择最佳的走法。如果当前玩家是最大玩家（self.is_max_player
-        为 True），则选择得分最高的走法；如果当前玩家是最小玩家，则选择得分最低的走法。
-
-        返回值是一个元组 (x, y)，代表棋盘上的坐标，是当前玩家应该执行的最佳走法。
-        如果没有可行的走法，返回最靠近中心的步
-        """
         best_score = float("-inf") if self.is_max_player else float("inf")
-        best_move = self.generate_moves()[0]
+        best_move = None
+        alpha = float("-inf")
+        beta = float("inf")
+
         for move in self.generate_moves():
             x, y = move
             self.place_piece(x, y)  # 模拟执行这个走法
-            score = self.minimax(0, not self.is_max_player)  # 评估这个走法
+            score = self.minimax_with_pruning(
+                0, not self.is_max_player, alpha, beta
+            )  # 使用带有剪枝的minimax
             self.remove_piece(x, y)  # 撤销这个走法
-            if (self.is_max_player and score > best_score) or (
-                not self.is_max_player and score < best_score
-            ):
-                best_score = score
-                best_move = move
-        return best_move
+
+            if self.is_max_player:
+                if score > best_score:
+                    best_score = score
+                    best_move = move
+                alpha = max(alpha, score)  # 更新 alpha 值
+            else:
+                if score < best_score:
+                    best_score = score
+                    best_move = move
+                beta = min(beta, score)  # 更新 beta 值
+
+            # 如果发现 alpha 大于等于 beta，则进行剪枝
+            if beta <= alpha:
+                break
+        return best_move if best_move is not None else self.generate_moves()[0]
 
     def minimax(self, depth, is_max_player):
         status, player = self.check_status()
@@ -245,6 +251,43 @@ class TicTacToe:
                 eval = self.minimax(depth + 1, True)
                 self.remove_piece(x, y)
                 minEval = min(minEval, eval)
+            return minEval
+
+    def minimax_with_pruning(
+        self, depth, is_max_player, alpha=float("-inf"), beta=float("inf")
+    ):
+        status, player = self.check_status()
+        if status == "Win":
+            return (1 if player == True else -1) * (self.max_step - depth)
+        elif status == "Draw":
+            return 0
+        if depth == self.max_step:
+            evaluator = ScoreEvaluator(self.board, self.target)
+            return evaluator.evaluate_score(self.is_max_player)
+
+        if is_max_player:
+            maxEval = float("-inf")
+            for move in self.generate_moves():
+                x, y = move
+                self.place_piece(x, y)
+                eval = self.minimax_with_pruning(depth + 1, False, alpha, beta)
+                self.remove_piece(x, y)
+                maxEval = max(maxEval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return maxEval
+        else:
+            minEval = float("inf")
+            for move in self.generate_moves():
+                x, y = move
+                self.place_piece(x, y)
+                eval = self.minimax_with_pruning(depth + 1, True, alpha, beta)
+                self.remove_piece(x, y)
+                minEval = min(minEval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
             return minEval
 
 

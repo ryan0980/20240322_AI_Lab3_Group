@@ -2,32 +2,55 @@ from board_logistic import TicTacToe
 from board_logistic import ScoreEvaluator
 
 
-def test_best_move():
-    game = TicTacToe(boardSize=3, target=3)  # 创建一个3x3的棋盘，获胜条件是连续3个棋子
+class TicTacToeAI(TicTacToe):
+    def ai_move(self):
+        """
+        AI 使用 minimax_with_pruning 算法进行移动。
+        """
+        move = self.best_move()  # 使用之前讨论的 best_move 方法
+        self.place_piece(*move)
+        print(f"AI ('O') 在位置 {move} 放置了一个棋子。")
+        self.print_board()
 
-    # 设置一个棋局，其中 'O' (True) 是下一步行棋方，并且处于获胜的边缘
-    game.set_board([[True, False, None], [None, False, True], [None, None, None]])
-    print("初始棋盘:")
-    game.print_board()
 
-    # 检查最佳移动
-    x, y = game.best_move()
-    print(f"最佳走法是在位置 ({x}, {y})")
+def human_vs_ai_game():
+    game = TicTacToeAI(
+        boardSize=12, target=5
+    )  # 初始化一个 12x12 的五子棋游戏，获胜条件是连续5个棋子
 
-    # 根据最佳走法放置棋子，并打印棋盘状态
-    game.place_piece(x, y)
-    print("执行最佳走法后的棋盘:")
-    game.print_board()
+    while True:
+        # 打印当前棋盘状态
+        game.print_board()
 
-    # 检查游戏状态
-    status, player = game.check_status()
+        # 人类玩家 'X' 移动
+        while True:
+            try:
+                x, y = map(int, input("输入你的移动 (格式：x y)：").split())
+                if not game.place_piece(x, y):
+                    raise ValueError
+                break
+            except ValueError:
+                print("无效的输入，请重新输入。")
+
+        # 检查游戏状态
+        status, player = game.check_status()
+        if status != "Continue":
+            break
+
+        # AI 'O' 移动
+        game.ai_move()
+
+        # 再次检查游戏状态
+        status, player = game.check_status()
+        if status != "Continue":
+            break
+
+    # 游戏结束，打印结果
     if status == "Win":
-        print(f"玩家 {'O' if player else 'X'} 获胜!")
+        print(f"{'人类' if player == False else 'AI'} 获胜！")
     elif status == "Draw":
-        print("游戏平局!")
-    else:
-        print("游戏继续.")
+        print("游戏平局！")
 
 
 if __name__ == "__main__":
-    test_best_move()
+    human_vs_ai_game()
