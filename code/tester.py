@@ -1,56 +1,45 @@
 from board_logistic import TicTacToe
 from board_logistic import ScoreEvaluator
+import time
 
 
 class TicTacToeAI(TicTacToe):
-    def ai_move(self):
-        """
-        AI 使用 minimax_with_pruning 算法进行移动。
-        """
-        move = self.best_move()  # 使用之前讨论的 best_move 方法
-        self.place_piece(*move)
-        print(f"AI ('O') 在位置 {move} 放置了一个棋子。")
+    def ai_move(self, is_max_player):
+        self.is_max_player = is_max_player  # 设置当前玩家
+        start_time = time.time()
+        move = self.best_move()  # 基于当前棋盘状态，找到最佳移动
+        self.print_board_with_scores()
+        self.place_piece(*move)  # 在棋盘上放置棋子
+        end_time = time.time()
+        print(
+            f"AI ('{'O' if is_max_player else 'X'}') 在位置 {move} 放置了一个棋子。用时: {end_time - start_time:.2f} 秒"
+        )
         self.print_board()
 
 
-def human_vs_ai_game():
+def ai_vs_ai_game():
     game = TicTacToeAI(
-        boardSize=12, target=5
-    )  # 初始化一个 12x12 的五子棋游戏，获胜条件是连续5个棋子
+        boardSize=6, target=4
+    )  # 初始化一个 5x5 的五子棋游戏，获胜条件是连续4个棋子
+
+    print("游戏开始，AI 对战 AI。")
+    current_player = True  # True 代表 "O" 玩家开始
 
     while True:
-        # 打印当前棋盘状态
-        game.print_board()
+        game.ai_move(current_player)  # 当前 AI 玩家移动
 
-        # 人类玩家 'X' 移动
-        while True:
-            try:
-                x, y = map(int, input("输入你的移动 (格式：x y)：").split())
-                if not game.place_piece(x, y):
-                    raise ValueError
-                break
-            except ValueError:
-                print("无效的输入，请重新输入。")
-
-        # 检查游戏状态
-        status, player = game.check_status()
+        status, player = game.check_status()  # 检查游戏状态
         if status != "Continue":
             break
 
-        # AI 'O' 移动
-        game.ai_move()
-
-        # 再次检查游戏状态
-        status, player = game.check_status()
-        if status != "Continue":
-            break
+        current_player = not current_player  # 切换玩家
 
     # 游戏结束，打印结果
     if status == "Win":
-        print(f"{'人类' if player == False else 'AI'} 获胜！")
+        print(f"AI ('{'O' if player else 'X'}') 获胜！")
     elif status == "Draw":
         print("游戏平局！")
 
 
 if __name__ == "__main__":
-    human_vs_ai_game()
+    ai_vs_ai_game()

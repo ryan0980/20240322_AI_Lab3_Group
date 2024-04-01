@@ -31,6 +31,35 @@ class TicTacToe:
             # 否则游戏继续
             return "Continue", None
 
+    def evaluate_move(self, x, y):
+        """
+        评估在 (x, y) 位置放置棋子后的评分。
+        """
+        self.place_piece(x, y)
+        score = self.minimax_with_pruning(
+            0, False, float("-inf"), float("inf")
+        )  # 假设接下来是对手的回合
+        self.remove_piece(x, y)
+        return score
+
+    def print_board_with_scores(self):
+        """
+        打印棋盘，并在每个空位旁边显示评分。
+        """
+        print("棋盘及评分：")
+        alpha = float("-inf")
+        beta = float("inf")
+        for x in range(self.boardSize):
+            row_str = ""
+            for y in range(self.boardSize):
+                if self.board[x][y] is None:  # 空位显示评分
+                    score = self.evaluate_move(x, y)
+                    row_str += f"[{score:2}] "
+                else:  # 非空位显示棋子
+                    piece = "O" if self.board[x][y] else "X"
+                    row_str += f" {piece}  "
+            print(row_str)
+
     def is_draw(self):
         """
         检查棋盘是否已满，即是否平局。
@@ -41,6 +70,12 @@ class TicTacToe:
             for x in range(self.boardSize)
             for y in range(self.boardSize)
         )
+
+    def step_taken(self):
+        """
+        返回当前已放置的棋子数量。
+        """
+        return sum(1 for row in self.board for cell in row if cell is not None)
 
     def check_win(self, x, y, piece):
         """
@@ -84,18 +119,30 @@ class TicTacToe:
 
     def print_board(self):
         """
-        打印当前棋盘的状态。
-        将 True 显示为 "O"，False 显示为 "X"，None 显示为 "-"。
+        以固定宽度打印棋盘，并在行和列索引旁添加边框，以改善视觉呈现。
         """
-        for row in self.board:
-            print(
-                " ".join(
-                    [
-                        "O" if cell is True else "X" if cell is False else "-"
-                        for cell in row
-                    ]
+        col_width = 3  # 每个格子的固定宽度
+        border = "+" + ("-" * col_width + "+") * self.boardSize
+
+        # 打印列索引
+        col_header = " " * (col_width + 1) + " ".join(
+            f"{i:^{col_width}}" for i in range(self.boardSize)
+        )
+        print(col_header)
+        print(border)
+
+        # 打印棋盘行，包括行号
+        for i, row in enumerate(self.board):
+            row_str = (
+                "|"
+                + "|".join(
+                    " O " if cell is True else " X " if cell is False else "   "
+                    for cell in row
                 )
+                + "|"
             )
+            print(f"{i:^{col_width}}{row_str}")
+            print(border)
 
     def place_piece(self, x, y):
         """
@@ -298,22 +345,23 @@ class ScoreEvaluator:
         self.target = target
 
     def evaluate_score(self, piece):
-        """
-        评估棋局得分。
-        piece: True 或 False，表示要评估哪方的得分（True代表"O"，False代表"X"）。
-        """
         score = 0
-        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]  # 水平、垂直、两个对角线方向
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+        evaluated_positions = set()
 
         for x in range(self.boardSize):
             for y in range(self.boardSize):
-                if self.board[x][y] == piece:
-                    for dx, dy in directions:
-                        score += self.evaluate_direction(x, y, dx, dy, piece)
+                if (x, y) in evaluated_positions or self.board[x][y] != piece:
+                    continue  # 跳过已评分或非目标棋子的位置
 
-        # 如果棋子是 "X"，取负分
+                for dx, dy in directions:
+                    # 只评分一次每个方向上的连续棋子
+                    if (x - dx, y - dy) not in evaluated_positions:
+                        score += self.evaluate_direction(x, y, dx, dy, piece)
+                        evaluated_positions.add((x, y))
+
         if not piece:
-            score = -score
+            score = -score  # 如果是 "X"，取负分
 
         return score
 
