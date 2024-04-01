@@ -8,7 +8,7 @@ class TicTacToeAI(TicTacToe):
         self.is_max_player = is_max_player  # 设置当前玩家
         start_time = time.time()
         move = self.best_move()  # 基于当前棋盘状态，找到最佳移动
-        self.print_board_with_scores()
+        # self.print_board_with_scores()
         self.place_piece(*move)  # 在棋盘上放置棋子
         end_time = time.time()
         print(
@@ -19,7 +19,7 @@ class TicTacToeAI(TicTacToe):
 
 def ai_vs_ai_game():
     game = TicTacToeAI(
-        boardSize=6, target=4
+        boardSize=7, target=4
     )  # 初始化一个 5x5 的五子棋游戏，获胜条件是连续4个棋子
 
     print("游戏开始，AI 对战 AI。")

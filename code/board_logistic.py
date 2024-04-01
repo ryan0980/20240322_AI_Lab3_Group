@@ -242,6 +242,17 @@ class TicTacToe:
         self.is_max_player = o_count == x_count
 
     def best_move(self):
+        # 首先检查 AI 自己是否有立即获胜的走法
+        win_move = self.search_win_move(True if self.is_max_player else False)
+        if win_move:
+            return win_move
+
+        # 然后检查对手是否有立即获胜的走法，如果有，阻止对手获胜
+        opponent_win_move = self.search_win_move(False if self.is_max_player else True)
+        if opponent_win_move:
+            return opponent_win_move
+
+        # 如果没有立即获胜的走法，使用 minimax 算法寻找最佳走法
         best_score = float("-inf") if self.is_max_player else float("inf")
         best_move = None
         alpha = float("-inf")
@@ -255,20 +266,18 @@ class TicTacToe:
             )  # 使用带有剪枝的minimax
             self.remove_piece(x, y)  # 撤销这个走法
 
-            if self.is_max_player:
-                if score > best_score:
-                    best_score = score
-                    best_move = move
-                alpha = max(alpha, score)  # 更新 alpha 值
-            else:
-                if score < best_score:
-                    best_score = score
-                    best_move = move
-                beta = min(beta, score)  # 更新 beta 值
+            if self.is_max_player and score > best_score:
+                best_score = score
+                best_move = move
+                alpha = max(alpha, score)
+            elif not self.is_max_player and score < best_score:
+                best_score = score
+                best_move = move
+                beta = min(beta, score)
 
-            # 如果发现 alpha 大于等于 beta，则进行剪枝
             if beta <= alpha:
                 break
+
         return best_move if best_move is not None else self.generate_moves()[0]
 
     def minimax(self, depth, is_max_player):
