@@ -7,8 +7,20 @@ class TicTacToe:
         self.board = [[None for _ in range(boardSize)] for _ in range(boardSize)]
         self.boardSize = boardSize
         self.target = target
-        self.max_step = 2  # 树中的最大步数
+        self.max_step = 2
+        # self.max_step = self.calculate_max_step()  # 树中的最大步数
         self.is_max_player = True  # 开始时默认为 True，即 O (最大玩家) 先行
+
+    def calculate_max_step(self):
+        # 基于棋盘大小动态计算 max_step
+        if self.boardSize <= 3:
+            return 9  # 对于 3x3 的棋盘，最大步数可以是全部格子
+        elif self.boardSize <= 5:
+            return 4  # 对于较小的棋盘，深度可以设置得较深
+        elif self.boardSize <= 8:
+            return 3  # 中等大小的棋盘，减少深度
+        else:
+            return 2  # 对于较大的棋盘，只搜索几层
 
     def check_status(self):
         """

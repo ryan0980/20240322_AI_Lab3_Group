@@ -18,9 +18,7 @@ class TicTacToeAI(TicTacToe):
 
 
 def ai_vs_ai_game():
-    game = TicTacToeAI(
-        boardSize=7, target=4
-    )  # 初始化一个 5x5 的五子棋游戏，获胜条件是连续4个棋子
+    game = TicTacToeAI(boardSize=7, target=5)
 
     print("游戏开始，AI 对战 AI。")
     current_player = True  # True 代表 "O" 玩家开始
