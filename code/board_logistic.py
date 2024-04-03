@@ -254,6 +254,8 @@ class TicTacToe:
         self.is_max_player = o_count == x_count
 
     def best_move(self):
+        if self.step_taken() == 0:
+            return (self.boardSize // 2, self.boardSize // 2)
         # 首先检查 AI 自己是否有立即获胜的走法
         win_move = self.search_win_move(True if self.is_max_player else False)
         if win_move:

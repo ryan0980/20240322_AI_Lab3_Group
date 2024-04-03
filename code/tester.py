@@ -12,15 +12,15 @@ class TicTacToeAI(TicTacToe):
         self.place_piece(*move)  # 在棋盘上放置棋子
         end_time = time.time()
         print(
-            f"AI ('{'O' if is_max_player else 'X'}') 在位置 {move} 放置了一个棋子。用时: {end_time - start_time:.2f} 秒"
+            f"AI ('{'O' if is_max_player else 'X'}') at {move} time use: {end_time - start_time:.2f} s"
         )
         self.print_board()
 
 
 def ai_vs_ai_game():
-    game = TicTacToeAI(boardSize=7, target=5)
+    game = TicTacToeAI(boardSize=20, target=10)
 
-    print("游戏开始，AI 对战 AI。")
+    print("game start, ai vs ai")
     current_player = True  # True 代表 "O" 玩家开始
 
     while True:
@@ -34,9 +34,9 @@ def ai_vs_ai_game():
 
     # 游戏结束，打印结果
     if status == "Win":
-        print(f"AI ('{'O' if player else 'X'}') 获胜！")
+        print(f"AI ('{'O' if player else 'X'}') win")
     elif status == "Draw":
-        print("游戏平局！")
+        print("draw")
 
 
 if __name__ == "__main__":
