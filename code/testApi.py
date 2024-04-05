@@ -41,6 +41,7 @@ class TicTacToeAI(TicTacToe):
         res = requests.request("GET", url=getop.url, headers=getop.headers)
         print(res.text)
         # Use the getBoardString API here to get the board state
+        # Thus, no need to open a new game everytime
         if res.text:
             responseJson = json.loads(res.text)
             board_string = responseJson["output"].strip()
@@ -56,7 +57,9 @@ def ai_vs_ai_game():
     global team_id1
     global team_id2
     global game_id
+    # input the first team, they will take the O pieces
     team_id1 = '1399'
+    # input the second team
     team_id2 = '1412'
     game_id = '4845'
     game = TicTacToeAI(boardSize=12, target=6)
