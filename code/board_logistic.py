@@ -1,3 +1,5 @@
+import time
+
 class TicTacToe:
     def __init__(self, boardSize=12, target=6):
         """
@@ -10,6 +12,7 @@ class TicTacToe:
         self.max_step = 2
         # self.max_step = self.calculate_max_step()  # 树中的最大步数
         self.is_max_player = True  # 开始时默认为 True，即 O (最大玩家) 先行
+        self.max_time=60 # allow 60 s for searching
 
     def calculate_max_step(self):
         # 基于棋盘大小动态计算 max_step

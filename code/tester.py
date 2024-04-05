@@ -18,7 +18,7 @@ class TicTacToeAI(TicTacToe):
 
 
 def ai_vs_ai_game():
-    game = TicTacToeAI(boardSize=20, target=10)
+    game = TicTacToeAI(boardSize=12, target=6)
 
     print("game start, ai vs ai")
     current_player = True  # True 代表 "O" 玩家开始
