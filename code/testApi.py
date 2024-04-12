@@ -1,7 +1,7 @@
 from board_logistic import TicTacToe
 from board_logistic import ScoreEvaluator
 import time
-import json
+
 from Apicall import *
 
 
@@ -41,7 +41,6 @@ class TicTacToeAI(TicTacToe):
         res = requests.request("GET", url=getop.url, headers=getop.headers)
         print(res.text)
         # Use the getBoardString API here to get the board state
-        # Thus, no need to open a new game everytime
         if res.text:
             responseJson = json.loads(res.text)
             board_string = responseJson["output"].strip()
@@ -57,12 +56,10 @@ def ai_vs_ai_game():
     global team_id1
     global team_id2
     global game_id
-    # input the first team, they will take the O pieces
-    team_id1 = '1399'
-    # input the second team
-    team_id2 = '1412'
-    game_id = '4845'
-    game = TicTacToeAI(boardSize=12, target=6)
+    team_id1 = '1417'
+    team_id2 = '1399'
+    game_id = '5177'
+    game = TicTacToeAI(boardSize=5, target=4)
 
     print("游戏开始，AI 对战 AI。")
     current_player = True  # True 代表 "O" 玩家开始
@@ -73,10 +70,13 @@ def ai_vs_ai_game():
         game.print_board()
         move = game.ai_move(current_player)  # 当前 AI 玩家移动
         move = ','.join(str(i) for i in move)
+        current_player = (game.getNextMover() == team_id1)
         if current_player:
             teamid = team_id1
+            continue
         else:
             teamid = team_id2
+
         post = POST()
         post.makeMove(teamid, game_id, move)
         print(post.payload)
@@ -85,7 +85,7 @@ def ai_vs_ai_game():
         status, player = game.check_status()  # 检查游戏状态
         if status != "Continue":
             break
-        current_player = (game.getNextMover() == team_id1)
+
 
     # 游戏结束，打印结果
     if status == "Win":
