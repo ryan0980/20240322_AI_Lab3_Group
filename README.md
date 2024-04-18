@@ -87,7 +87,8 @@ Distributed under the WDFPL License. See `LICENSE` for more information.
 
 - Shi Qiu - tusrau@gmail.com
 - Haidong Zheng - 
-- Zheyu Qin - 
+- Zheyu Qin -
+  
 Project Link: [https://github.com/ryan0980/20240322_AI_Lab3_Group/tree/main](https://github.com/ryan0980/20240322_AI_Lab3_Group/tree/main)
 
 ## Acknowledgments
